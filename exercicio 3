@@ -1,0 +1,166 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_AGENDA_SIZE 100
+
+typedef struct {
+    char nome[50];
+    char telefone[15];
+    char tipo_telefone[20];
+    char email[50];
+    char aniversario[11];
+} Contato;
+
+Contato agenda[MAX_AGENDA_SIZE];
+int agendaSize = 0;
+
+void apaga(int pos) {
+    if (pos < 0 || pos >= agendaSize) {
+        printf("Posição inválida.\n");
+        return;
+    }
+
+    for (int i = pos; i < agendaSize - 1; i++) {
+        agenda[i] = agenda[i + 1];
+    }
+
+    agendaSize--;
+    printf("Contato removido com sucesso.\n");
+}
+
+void altera(int pos) {
+    if (pos < 0 || pos >= agendaSize) {
+        printf("Posição inválida.\n");
+        return;
+    }
+
+    Contato novoContato;
+    printf("Novo nome: ");
+    scanf("%s", novoContato.nome);
+    printf("Novo telefone: ");
+    scanf("%s", novoContato.telefone);
+    printf("Novo tipo de telefone: ");
+    scanf("%s", novoContato.tipo_telefone);
+    printf("Novo email: ");
+    scanf("%s", novoContato.email);
+    printf("Nova data de aniversário (DD/MM/AAAA): ");
+    scanf("%s", novoContato.aniversario);
+
+    agenda[pos] = novoContato;
+
+    printf("Contato alterado com sucesso.\n");
+}
+
+void lista() {
+    printf("Agenda:\n");
+    for (int i = 0; i < agendaSize; i++) {
+        printf("Posição: %d\n", i + 1);
+        printf("Nome: %s\n", agenda[i].nome);
+        printf("Telefone: %s\n", agenda[i].telefone);
+        printf("Tipo de Telefone: %s\n", agenda[i].tipo_telefone);
+        printf("Email: %s\n", agenda[i].email);
+        printf("Aniversário: %s\n", agenda[i].aniversario);
+        printf("\n");
+    }
+}
+
+void le() {
+    if (agendaSize >= MAX_AGENDA_SIZE) {
+        printf("Agenda cheia.\n");
+        return;
+    }
+
+    Contato novoContato;
+    printf("Nome: ");
+    scanf("%s", novoContato.nome);
+
+    for (int i = 0; i < agendaSize; i++) {
+        if (strcmp(novoContato.nome, agenda[i].nome) == 0) {
+            printf("Erro: Já existe um contato com esse nome.\n");
+            return;
+        }
+    }
+
+    printf("Telefone: ");
+    scanf("%s", novoContato.telefone);
+    printf("Tipo de Telefone: ");
+    scanf("%s", novoContato.tipo_telefone);
+    printf("Email: ");
+    scanf("%s", novoContato.email);
+    printf("Data de aniversário (DD/MM/AAAA): ");
+    scanf("%s", novoContato.aniversario);
+
+    agenda[agendaSize++] = novoContato;
+
+    printf("Contato adicionado com sucesso.\n");
+}
+
+void grava() {
+    FILE *arquivo;
+    arquivo = fopen("agenda.txt", "w");
+
+    if (arquivo == NULL) {
+        printf("Erro ao abrir arquivo.\n");
+        return;
+    }
+
+    for (int i = 0; i < agendaSize; i++) {
+        fprintf(arquivo, "%s %s %s %s %s\n", agenda[i].nome, agenda[i].telefone, agenda[i].tipo_telefone, agenda[i].email, agenda[i].aniversario);
+    }
+
+    fclose(arquivo);
+    printf("Agenda salva com sucesso.\n");
+}
+
+void menu() {
+    int opcao, pos;
+
+    do {
+        printf("\n*** MENU ***\n");
+        printf("1. Adicionar contato\n");
+        printf("2. Remover contato\n");
+        printf("3. Alterar contato\n");
+        printf("4. Listar contatos\n");
+        printf("5. Gravar agenda\n");
+        printf("6. Tamanho da agenda\n");
+        printf("0. Sair\n");
+        printf("Escolha uma opção: ");
+        scanf("%d", &opcao);
+
+        switch (opcao) {
+            case 1:
+                le();
+                break;
+            case 2:
+                printf("Posição do contato a ser removido: ");
+                scanf("%d", &pos);
+                apaga(pos - 1);
+                break;
+            case 3:
+                printf("Posição do contato a ser alterado: ");
+                scanf("%d", &pos);
+                altera(pos - 1);
+                break;
+            case 4:
+                lista();
+                break;
+            case 5:
+                grava();
+                break;
+            case 6:
+                printf("Tamanho da agenda: %d\n", agendaSize);
+                break;
+            case 0:
+                printf("Saindo...\n");
+                break;
+            default:
+                printf("Opção inválida.\n");
+        }
+    } while (opcao != 0);
+}
+
+int main() {
+    menu();
+    return 0;
+}
